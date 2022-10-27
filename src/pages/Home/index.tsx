@@ -33,6 +33,7 @@ interface Cycle {
 export function Home() {
   const [cycles, setCycles] = useState<Cycle[]>([])
   const [activeCycleId, setActiveCycleId] = useState<string | null>(null)
+  const [amountSecondsPassed, setAmountSecondsPassed] = useState(0)
 
   const { register, handleSubmit, watch, reset } = useForm<NewCycleFormData>({
     resolver: zodResolver(newCycleFormValidationSchema),
@@ -60,7 +61,21 @@ export function Home() {
 
   // Com base no id do ciclo ativo, percorrer todos os ciclos e me retornar qual é o ciclo que tem o mesmo id do ciclo ativo
   const activeCycle = cycles.find((cycle) => cycle.id === activeCycleId)
-  console.log(activeCycle)
+
+  // Transformando o minutos em segundos, Pegando o total de minutos x 60
+  const totalSeconds = activeCycle ? activeCycle.minutesAmount * 60 : 0
+  // Pegando o total de segundos que já passou e armazenando na variável currentSeconds.
+  const currentSeconds = activeCycle ? totalSeconds - amountSecondsPassed : 0
+
+  // Pegando o total de segundos e transformando em minutos, Usando método Math.floor para arredondar o número para baixo
+  const minutesAmount = Math.floor(currentSeconds / 60)
+
+  // Calculando quantos segundos eu tenho do resto da divisão.
+  const secondsAmount = currentSeconds % 60
+
+  // Convertendo os minutos/segundos para uma string, porque usamos o método padStart para preencher uma string um tamanho específico caso ele não tenha com algum carácter
+  const minutes = String(minutesAmount).padStart(2, '0')
+  const seconds = String(secondsAmount).padStart(2, '0')
 
   const task = watch('task')
   const isSubmitDisabled = !task
@@ -99,11 +114,11 @@ export function Home() {
         </FormContainer>
 
         <CountdownContainer>
-          <span>0</span>
-          <span>0</span>
+          <span>{minutes[0]}</span>
+          <span>{minutes[1]}</span>
           <Separator>:</Separator>
-          <span>0</span>
-          <span>0</span>
+          <span>{seconds[0]}</span>
+          <span>{seconds[1]}</span>
         </CountdownContainer>
 
         <StartCountdownButton disabled={isSubmitDisabled} type="submit">
