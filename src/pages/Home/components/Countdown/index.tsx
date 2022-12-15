@@ -1,9 +1,9 @@
-import { differenceInSeconds } from 'date-fns'
-import { useContext, useEffect } from 'react'
+import { differenceInSeconds } from "date-fns";
+import { useContext, useEffect } from "react";
 
-import { CyclesContext } from '../../../../contexts/CyclesContext'
+import { CyclesContext } from "../../../../contexts/CyclesContext";
 
-import { CountdownContainer, Separator } from './styles'
+import { CountdownContainer, Separator } from "./styles";
 
 export function Countdown() {
   const {
@@ -12,60 +12,60 @@ export function Countdown() {
     markCurrentCyclesAsFinished,
     amountSecondsPassed,
     setSecondsPassed,
-  } = useContext(CyclesContext)
+  } = useContext(CyclesContext);
 
   // Transformando o minutos em segundos, Pegando o total de minutos x 60
-  const totalSeconds = activeCycle ? activeCycle.minutesAmount * 60 : 0
+  const totalSeconds = activeCycle ? activeCycle.minutesAmount * 60 : 0;
 
   useEffect(() => {
-    let interval: number
+    let interval: number;
 
     if (activeCycle) {
       interval = setInterval(() => {
         const secondsDifference = differenceInSeconds(
           new Date(),
-          activeCycle.startDate,
-        )
+          new Date(activeCycle.startDate)
+        );
 
         if (secondsDifference >= totalSeconds) {
-          markCurrentCyclesAsFinished()
-          setSecondsPassed(totalSeconds)
-          clearInterval(interval)
+          markCurrentCyclesAsFinished();
+          setSecondsPassed(totalSeconds);
+          clearInterval(interval);
         } else {
-          setSecondsPassed(secondsDifference)
+          setSecondsPassed(secondsDifference);
         }
-      }, 1000)
+      }, 1000);
     }
 
     return () => {
-      clearInterval(interval)
-    }
+      clearInterval(interval);
+    };
   }, [
     activeCycle,
     totalSeconds,
     activeCycleId,
     markCurrentCyclesAsFinished,
     setSecondsPassed,
-  ])
+  ]);
 
   // Pegando o total de segundos que já passou e armazenando na variável currentSeconds.
-  const currentSeconds = activeCycle ? totalSeconds - amountSecondsPassed : 0
+  const currentSeconds = activeCycle ? totalSeconds - amountSecondsPassed : 0;
 
   // Pegando o total de segundos e transformando em minutos, Usando método Math.floor para arredondar o número para baixo
-  const minutesAmount = Math.floor(currentSeconds / 60)
+  const minutesAmount = Math.floor(currentSeconds / 60);
 
   // Calculando quantos segundos eu tenho do resto da divisão.
-  const secondsAmount = currentSeconds % 60
+  const secondsAmount = currentSeconds % 60;
 
   // Convertendo os minutos/segundos para uma string, porque usamos o método padStart para preencher uma string um tamanho específico caso ele não tenha com algum carácter
-  const minutes = String(minutesAmount).padStart(2, '0')
-  const seconds = String(secondsAmount).padStart(2, '0')
+  const minutes = String(minutesAmount).padStart(2, "0");
+  const seconds = String(secondsAmount).padStart(2, "0");
 
   useEffect(() => {
     if (activeCycle) {
-      document.title = `Timer ${minutes}:${seconds}`
+      document.title = `Timer ${minutes}:${seconds}`;
     }
-  }, [minutes, seconds, activeCycle])
+  }, [minutes, seconds, activeCycle]);
 
   return (
     <CountdownContainer>
@@ -75,5 +75,5 @@ export function Countdown() {
       <span>{seconds[0]}</span>
       <span>{seconds[1]}</span>
     </CountdownContainer>
-  )
+  );
 }
